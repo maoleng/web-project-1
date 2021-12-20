@@ -1,7 +1,6 @@
 <style type="text/css">
 	a {
 		text-decoration: none;
-
 	}
 	a:link {
 		color: blue;
@@ -19,7 +18,6 @@
 	ul {
 		list-style-type: none;
 		padding: 0;
-
 	}
 	ul li ul li {
 		background: ghostwhite;
@@ -60,6 +58,9 @@
 	p {
 		text-align: center;
 	}
+	table {
+		margin: auto	;
+	}
 	.right {
 		text-align: right;
 	}	
@@ -75,16 +76,18 @@
 	.no_border {
 		border: none;
 	}
-	table {
-		margin: auto	;
+	.no_decor {
+		text-decoration: none;
 	}
 	.error {
 		color: red;
 		text-align: left;
 	}
-
 	.success {
 		color: green;
+	}
+	.margin {
+		margin: auto;
 	}
 </style>
 
@@ -107,36 +110,36 @@
 			if (isset($_SESSION['customer_id'])) {
 				?>
 				<li> 
-				<a href="cart.php">
-					<p>
-						Giỏ hàng
-					</p>
-				</a> 
-			</li><li> 
-				<a href="sign_out.php">
-					<p>
-						Đăng xuất
-					</p>
-				</a> 
-			</li>
+					<a href="cart.php">
+						<p>
+							Giỏ hàng
+						</p>
+					</a> 
+				</li><li> 
+					<a href="sign_out.php">
+						<p>
+							Đăng xuất
+						</p>
+					</a> 
+				</li>
 			<?php } else { ?>
 				<li> 
-				<a href="sign_in.php">
-					<p>
-						Đăng nhập
-					</p>
-				</a> 
-			</li>
-			<li> 
-				<a href="sign_up.php">
-					<p>
-						Đăng ký
-					</p>
-				</a> 
-			</li>
+					<a href="sign_in.php">
+						<p>
+							Đăng nhập
+						</p>
+					</a> 
+				</li>
+				<li> 
+					<a href="sign_up.php">
+						<p>
+							Đăng ký
+						</p>
+					</a> 
+				</li>
 				<?php
 			}
-			 ?>
+			?>
 		</ul>
 	</li>
 </ul>
