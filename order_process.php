@@ -10,20 +10,34 @@ $note = $_POST['note'];
 $order_time = date("d-m-Y h:i:s");
 
 $status = 1;
+$sql = "select id from receipts where customer_id = '$customer_id' and status = '$status'";
+$result = mysqli_query($connect,$sql);
+$receipt = mysqli_fetch_array($result);
+$receipt_id = $receipt['id'];
 
-$sql = "insert into receipts(customer_id,order_time,receiver_name,receiver_phone,receiver_address,note,status)
-values ('$customer_id','$order_time','$receiver_name','$receiver_phone','$receiver_address','$note','$status')";
+
+$status = 2;
+$sql = "update receipts
+set 
+order_time = '$order_time',
+receiver_name = '$receiver_name',
+receiver_phone = '$receiver_phone',
+receiver_address = '$receiver_address',
+note = '$note',
+status = '$status'
+where
+id = $receipt_id";
 mysqli_query($connect,$sql);
 
-$sql = "select id from receipts where customer_id = '$customer_id' and order_time = '$order_time'";
+$sql = "select id from receipts where customer_id = '$customer_id' and status = '$status'";
 $result = mysqli_query($connect,$sql);
-foreach ($result as $each) {
-    $receipt_id = $each['id'];
-}
+$receipt = mysqli_fetch_array($result);
+$receipt_id = $receipt['id'];
 
-$result = $_SESSION['cart'];
+$sql = "select * from receipt_detail where receipt_id = '$receipt_id'";
+$result = mysqli_query($connect,$sql);
 foreach ($result as $product_id => $each):
-    $product_id = $each['id'];
+    $product_id = $each['product_id'];
     $quantity = $each['quantity'];
     
     $sql = "insert into receipt_detail(receipt_id, product_id, quantity)
@@ -32,8 +46,9 @@ foreach ($result as $product_id => $each):
     mysqli_query($connect, $sql);
 endforeach;
 
-$_SESSION['order'][$receipt_id] = $_SESSION['cart'];
-unset($_SESSION['cart']);
+$_SESSION['order'][$customer_id][$receipt_id] = $_SESSION['cart'][$customer_id];
+unset($_SESSION['cart'][$customer_id]);
+$_SESSION['success'] = "Đơn hàng đang chờ xét duyệt";
 header('location:order.php');
 mysqli_close($connect);
 ?>
