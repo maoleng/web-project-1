@@ -7,6 +7,10 @@ require 'check_account.php';
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title></title>
+	<link rel="stylesheet" type="text/css" href="menu.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 	<style type="text/css">
 		th, td {
 			border:  1px solid black;
@@ -15,31 +19,32 @@ require 'check_account.php';
 	</style>
 </head>
 <body>
-	<?php 
-	$total = 0;
-	require 'announce.php';
-	require 'connect.php';
-	$status = '1';
-	$sql = "select
-	products.id as id,
-	products.name as name,
-	products.image as image,
-	manufacturers.name as manufacturer_name,
-	products.price as price,
-	receipt_detail.quantity as quantity,
-	receipts.customer_id as customer_id,
-	receipts.id as receipt_id,
-	receipts.status as status	
-	from receipt_detail
-	join receipts on receipts.id = receipt_detail.receipt_id
-	join products on products.id = receipt_detail.product_id
-	join manufacturers on products.manufacturer_id = manufacturers.id
-	where receipts.customer_id = $customer_id and receipts.status = '$status'";
-	$result = mysqli_query($connect,$sql);
-	$rows = mysqli_num_rows($result);
-	?>
-	<div id="div_tong">
-		<?php require 'menu.php'; ?>
+	
+	<div id="div_tong" class="container">
+		<?php
+		$total = 0;
+		require 'announce.php';
+		require 'connect.php';
+		require 'menu.php';
+		$status = '1';
+		$sql = "select
+		products.id as id,
+		products.name as name,
+		products.image as image,
+		manufacturers.name as manufacturer_name,
+		products.price as price,
+		receipt_detail.quantity as quantity,
+		receipts.customer_id as customer_id,
+		receipts.id as receipt_id,
+		receipts.status as status	
+		from receipt_detail
+		join receipts on receipts.id = receipt_detail.receipt_id
+		join products on products.id = receipt_detail.product_id
+		join manufacturers on products.manufacturer_id = manufacturers.id
+		where receipts.customer_id = $customer_id and receipts.status = '$status'";
+		$result = mysqli_query($connect,$sql);
+		$rows = mysqli_num_rows($result);
+		?>
 		<div id="div_tren">
 			<h3>
 				Đây là giỏ hàng cá nhân
@@ -55,30 +60,44 @@ require 'check_account.php';
 				$cart = mysqli_fetch_array($result);
 				$receipt_id = $cart['receipt_id'];
 				?>
-				<h4 class="center empty"></h4>
-				<table class="border table" width="100%">
+				<h4 class="center" id="empty"></h4>
+				<table id="table" class="border" width="100%" style="border: 1px solid black; margin: auto;">
 					<tr>
-						<th width="20%">
-							Tên sản phẩm
-						</th>
-						<th>
-							Hình ảnh
-						</th>
-						<th>
-							Nhà sản xuất
-						</th>
-						<th>
-							Giá
-						</th>
-						<th>
-							Số lượng
-						</th>
-						<th>
-							Xoá
-						</th>
-						<th width="15%">
-							Thành tiền
-						</th>
+						<td width="20%">
+							<b>
+								Tên sản phẩm
+							</b>
+						</td>
+						<td>
+							<b>
+								Hình ảnh
+							</b>
+						</td>
+						<td>
+							<b>
+								Nhà sản xuất
+							</b>
+						</td>
+						<td>
+							<b>
+								Giá
+							</b>
+						</td>
+						<td>
+							<b>
+								Số lượng
+							</b>
+						</td>
+						<td>
+							<b>
+								Xoá
+							</b>
+						</td>
+						<td width="15%">
+							<b>
+								Thành tiền
+							</b>
+						</td>
 					</tr>
 					<?php foreach ($result as $each): ?>
 						<?php 
@@ -150,7 +169,7 @@ require 'check_account.php';
 						</td>
 						<td>
 							<button>
-								<a href="order_form.php">
+								<a data-toggle="modal" href="#modal-order" id="btn-order-form">
 									Đặt hàng
 								</a>
 							</button>
@@ -162,104 +181,111 @@ require 'check_account.php';
 			?>
 		</div>
 		<div id="div_duoi">
-			<?php 
-			require 'footer.php';
+			<?php
 			mysqli_close($connect);
+			require 'footer.php';
 			?>
 		</div>
 	</div>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-	<script type="text/javascript">
-		$(document).ready(function() {
-			$(".btn-del").click(function() {
-				let btn = $(this);
-				let id = btn.data('id');
-				let type = btn.data('type');
-				$.ajax({
-					url: 'cart_process.php',
-					type: 'GET',
-					data: {id, type},
-				})
-				.done(function() {
-					let table_row = $(".table > tbody > tr").length;
-					if (table_row == 4) {
-						btn.parents('table').remove();
-						$(".empty").text("Giỏ hàng không có gì !!");
-					} else {
-						btn.parents('tr').remove();
-						$(".span-del").each(function() {
-							total += parseFloat(($(this).text()).replace(/,/g, ''));
-						});
-						total = total.toLocaleString();
-						$('.span-total').text(total);
-					}
-				})
-			});
-			$(".btn-incre").click(function() {
-				let btn = $(this);
-				let id = btn.data('id');
-				let type = btn.data('type');
-				$.ajax({
-					url: 'cart_process.php',
-					type: 'GET',
-					data: {id, type},
-				})
-				.done(function() {
-					let parent_tr = btn.parents('tr');
-					let quantity = parseFloat(parent_tr.find('.span-quantity').text());
-					let price = parseFloat((parent_tr.find('.span-price').text()).replace(/,/g, ''));
-					quantity ++;
-					let sum = price * quantity;
-					sum = sum.toLocaleString();
-					parent_tr.find('.span-quantity').text(quantity);
-					parent_tr.find('.span-sum').text(sum);
-					let total = 0;
-					$(".span-sum").each(function() {
-						total += parseFloat(($(this).text()).replace(/,/g, ''));
-					});
-					total = total.toLocaleString();
-					$('.span-total').text(total);
-				})
-			});
-			$(".btn-decre").click(function(event) {
-				let btn = $(this);
-				let id = btn.data('id');
-				let type = btn.data('type');
-				$.ajax({
-					url: 'cart_process.php',
-					type: 'GET',
-					data: {id, type},
-				})
-				.done(function() {
-					let parent_tr = btn.parents('tr');
-					let quantity = parseFloat(parent_tr.find('.span-quantity').text());
-					let price = parseFloat((parent_tr.find('.span-price').text()).replace(/,/g, ''));
-					quantity --;
-					if (quantity == 0) {
-						let table_row = $(".table > tbody > tr").length;
-						if (table_row == 4) {
-							btn.parents('table').remove();
-							$(".empty").text("Giỏ hàng không có gì !!");
-						} else {
-							parent_tr.remove();
-						}
-					} else {
-						let sum = price * quantity;
-						sum = sum.toLocaleString();
-						parent_tr.find('.span-quantity').text(quantity);
-						parent_tr.find('.span-sum').text(sum);
-					}
-					let total = 0;
-					$(".span-sum").each(function() {
-						total += parseFloat(($(this).text()).replace(/,/g, ''));
-					});
-					total = total.toLocaleString();
-					$('.span-total').text(total);
-					let table_row = ($('.table')).rows.length;
-					$('.span-total').text(table_row);
-				})
-			});
-		});
-	</script>
 </body>
 </html>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$(".btn-incre").click(function(event) {
+			let btn = $(this);
+			let id = btn.data('id');
+			let type = btn.data('type');
+			$.ajax({
+				url: 'cart_process.php',
+				type: 'GET',
+				data: {id, type},
+			})
+			.done(function() {
+				let parent_tr = btn.parents("tr");
+				let quantity = parseFloat(parent_tr.find('.span-quantity').text());
+				let price = parseFloat((parent_tr.find('.span-price').text()).replace(/,/g, ''));
+				quantity ++;
+				let sum = price * quantity;
+				sum = sum.toLocaleString();
+				parent_tr.find('.span-quantity').text(quantity);
+				parent_tr.find('.span-sum').text(sum);
+				let total = 0;
+				$(".span-sum").each(function() {
+					total += parseFloat(($(this).text()).replace(/,/g, ''));
+				});
+				total = total.toLocaleString();
+				$('.span-total').text(total);
+			})
+		});
+		$(".btn-decre").click(function(event) {
+			let btn = $(this);
+			let id = btn.data('id');
+			let type = btn.data('type');
+			$.ajax({
+				url: 'cart_process.php',
+				type: 'GET',
+				data: {id, type},
+			})
+			.done(function() {
+				let parent_tr = btn.parents("tr");
+				let quantity = parseFloat(parent_tr.find('.span-quantity').text());
+				let price = parseFloat((parent_tr.find('.span-price').text()).replace(/,/g, ''));
+				quantity --;
+				let sum = price * quantity;
+				if (sum == 0) {
+					parent_tr.remove();
+				}
+				sum = sum.toLocaleString();
+				parent_tr.find('.span-quantity').text(quantity);
+				parent_tr.find('.span-sum').text(sum);
+				let total = 0;
+				$(".span-sum").each(function() {
+					total += parseFloat(($(this).text()).replace(/,/g, ''));
+				});
+				total = total.toLocaleString();
+				if (total == 0) {
+					$("#table").hide();
+					$("#empty").text("Giỏ hàng không có gì !!!" );
+				}
+				$('.span-total').text(total);
+			})
+		});
+		$(".btn-del").click(function(event) {
+			let btn = $(this);
+			let id = btn.data('id');
+			let type = btn.data('type');
+			$.ajax({
+				url: 'cart_process.php',
+				type: 'GET',
+				data: {id, type},
+			})
+			.done(function() {
+				let parent_tr = btn.parents("tr");
+				let quantity = 0;
+				let price = parseFloat((parent_tr.find('.span-price').text()).replace(/,/g, ''));
+				let sum = price * quantity;
+				if (sum == 0) {
+					parent_tr.remove();
+				}
+				sum = sum.toLocaleString();
+				parent_tr.find('.span-quantity').text(quantity);
+				parent_tr.find('.span-sum').text(sum);
+				let total = 0;
+				$(".span-sum").each(function() {
+					total += parseFloat(($(this).text()).replace(/,/g, ''));
+				});
+				if (total == 0) {
+					$("#table").hide();
+					$("#empty").text("Giỏ hàng không có gì !!!" );
+				}
+				total = total.toLocaleString();
+
+				$('.span-total').text(total);
+			})
+		});
+	});
+</script>
+<?php 
+include 'order_form.php';
+include 'receiver_modal.php';
+?>
