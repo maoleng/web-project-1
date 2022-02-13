@@ -1,5 +1,10 @@
 <?php 
-require "check_account.php";
+session_start();
+if (isset($_SESSION['customer_id'])) {
+	$customer_id = $_SESSION['customer_id'];
+} else if (isset($_SESSION['admin_id'])) {
+	header('location:admin/root/index_admin.php');
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -9,6 +14,8 @@ require "check_account.php";
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+	<script src="notify/notify.js"></script>
+	<script src="notify/notify.min.js"></script>
 	<title></title>
 	<style type="text/css">
 		a {
@@ -113,6 +120,8 @@ require "check_account.php";
 		<div id="div_tren">
 			<?php 
 			require 'connect.php';
+			$sql = "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))";
+			mysqli_query($connect, $sql);
 			$trang = 1;
 			if (isset($_GET['trang'])) {
 				$trang = $_GET['trang'];
@@ -122,15 +131,19 @@ require "check_account.php";
 			if (isset($_GET['tim_kiem'])) {
 				$tim_kiem = $_GET['tim_kiem'];
 			}
-			$sql_so_san_pham = "select count(*) from products
-			where
-			name like '%$tim_kiem%'";
 			if (isset($_GET['type_id'])) {
 				$type_id = $_GET['type_id'];
+			}
+			if ($type_id == "") {
 				$sql_so_san_pham = "select count(*) from products
-				join product_type on product_type.product_id = products.id
 				where
-				name like '%$tim_kiem%' and product_type.type_id like '%$type_id%'";
+				name like '%$tim_kiem%'";
+			} else {
+				$sql_so_san_pham = "select count(*)
+				from products join product_type on product_type.product_id = products.id
+				where
+				products.name like '%$tim_kiem%' and product_type.type_id like '%$type_id%'
+				group by products.name";
 			}
 			$mang_so_san_pham = mysqli_query($connect,$sql_so_san_pham);
 			$ket_qua_so_san_pham = mysqli_fetch_array($mang_so_san_pham);
@@ -159,14 +172,22 @@ require "check_account.php";
 				?>
 			</div>
 			<?php
-			$sql = "select
-			products.*,
-			product_type.type_id as type_id
-			from products
-			join product_type on product_type.product_id = products.id
-			where
-			products.name like '%$tim_kiem%' and product_type.type_id like '%$type_id%'
-			limit $so_san_pham_1_trang offset $bo_qua";
+			if ($type_id == "") {
+				$sql = "select * from products
+				where
+				products.name like '%$tim_kiem%'
+				limit $so_san_pham_1_trang offset $bo_qua";
+			} else {
+				$sql = "select
+				products.*,
+				product_type.type_id as type_id
+				from products
+				join product_type on product_type.product_id = products.id
+				where
+				products.name like '%$tim_kiem%' and product_type.type_id like '%$type_id%'
+				group by products.name
+				limit $so_san_pham_1_trang offset $bo_qua";
+			}
 			$result = mysqli_query($connect, $sql);
 			?>
 			<form>
@@ -243,7 +264,10 @@ require "check_account.php";
 				url: 'cart_process.php',
 				type: 'GET',
 				data: {id, type},
-			})	
+			})
+			.done(function(response) {
+				$.notify("Thêm vào giỏ hàng thành công", "success");
+			})
 		});
 	});
 </script>
