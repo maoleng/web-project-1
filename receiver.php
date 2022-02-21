@@ -11,6 +11,8 @@ require 'check_account.php';
 	<link rel="stylesheet" type="text/css" href="menu.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+	<script src="notify/notify.js"></script>
+	<script src="notify/notify.min.js"></script>
 	<style type="text/css">
 		td {
 			border: 1px solid black;
@@ -20,7 +22,6 @@ require 'check_account.php';
 <body>
 	<?php 
 	require 'connect.php';
-	require 'announce.php';
 	$customer_id = $_SESSION['customer_id'];
 	$sql = "select * from receivers where customer_id = '$customer_id'";
 	$result = mysqli_query($connect,$sql);
@@ -71,7 +72,7 @@ require 'check_account.php';
 									Số điện thoại:
 								</b>
 							</td>
-							<td width="200px" >
+							<td width="200px">
 								<b>
 									Địa chỉ:
 								</b>
@@ -98,16 +99,16 @@ require 'check_account.php';
 							?>
 							<tr>
 								<td>
-									<?php echo $num ?>
+									<span id="span-<?php echo $num ?>"><?php echo $num ?></span>
 								</td>
 								<td>
-									<?php echo $each['name'] ?>
+									<span class="span-name"><?php echo $each['name'] ?></span>
 								</td>
 								<td>
-									<?php echo $each['phone'] ?>
+									<span class="span-phone"><?php echo $each['phone'] ?></span>
 								</td>
 								<td height="70px">
-									<?php echo $each['address'] ?>
+									<span class="span-address"><?php echo $each['address'] ?></span>
 								</td>
 								<td>
 									<a href="receiver_delete_process.php?id=<?php echo $num ?>">
@@ -142,7 +143,6 @@ require 'check_account.php';
 										<span style="display: none;" class="span-dfl">
 											Mặc định
 										</span>
-										
 									<?php } ?>
 								</td>
 							</tr>
@@ -183,26 +183,45 @@ require 'check_account.php';
 				parent_tr.find('button').hide();
 				parent_tb.find('.span-dfl').hide();
 				parent_tr.find('.span-dfl').show();
+				$.notify("Thay đổi địa chỉ mặc định thành công", "success");
 			})
 		});
-		$(".btn-receiver-form").click(function() {
+		$("#btn-receiver-delete").click(function() {
 			event.preventDefault();
 			let btn = $(this);
-			// let parent_tr = btn.parents("tr");
-			// let parent_tb = btn.parents("table");
 			let id = btn.data('id');
 			$.ajax({
-				url: 'receiver_form_change1.php',
-				type: 'GET',
+				url: 'receiver_delete_process.php',
+				type: 'POST',
+				data: {id},
+			})
+			.done(function() {
+				location.reload();
+			})
+		});
+		$("#btn-receiver-form").click(function() {
+			event.preventDefault();
+			let btn = $(this);
+			let id = btn.data('id');
+			$.ajax({
+				url: 'receiver_data.php',
+				type: 'POST',
+				dataType: 'json',
 				data: {id},
 			})
 			.done(function(response) {
-				$("#div-body").append(response);
-				// parent_tb.find('button').show();
-				// parent_tr.find('button').hide();
-				// parent_tb.find('.span-dfl').hide();
-				// parent_tr.find('.span-dfl').show();
+				$("#span_rcv_id").text(response["id"]);
+				$("#rcv_id").attr('value', response["id"]);
+				$("#rcv_name").attr('value', response["name"]);
+				$("#rcv_phone").attr('value', response["phone"]);
+				$("#rcv_address").attr('value', response["address"]);
 			})
 		});
 	});
+</script>
+<script type="text/javascript">
+	if ("<?php echo $_SESSION['notify'] ?>" != "") {
+		$.notify("<?php echo $_SESSION['notify'] ?>", "success");
+		<?php unset($_SESSION['notify']) ?>
+	}
 </script>
