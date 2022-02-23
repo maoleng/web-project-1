@@ -1,11 +1,10 @@
 <?php 
 require 'connect.php';
 $customer_id = $_SESSION['customer_id'];
-$sql = "select * from receivers where customer_id = '$customer_id'";
+$sql = "select * from receivers where customer_id = '$customer_id' and status <> '2'";
 $result = mysqli_query($connect,$sql);
 $rows = mysqli_num_rows($result);
 $num = 0;
-mysqli_close($connect);
 ?>
 <div class="modal fade" id="modal-receiver">
 	<div class="modal-dialog" style="width: 700px;">
@@ -73,14 +72,14 @@ mysqli_close($connect);
 									<?php echo $each['address'] ?>
 								</td>
 								<td>
-									<a data-toggle="modal" href="#modal-receiver-form-change" id="btn-receiver-form" data-id="<?php echo $each['id'] ?>">
+									<a data-toggle="modal" href="#modal-receiver-form-change" id="btn-receiver-form" data-id="<?php echo $each['id'] ?>" data-num="<?php echo $num ?>">
 										Sửa
 									</a>
 								</td>
 								<td class="center">
-									<?php if ($each['status'] != 2) { ?>
+									<?php if ($each['status'] != 1) { ?>
 										<button class="btn-rcv">
-											<a class="btn-receiver" data-id="<?php echo $each['id'] ?>" data-type="slc">
+											<a class="btn-receiver" data-id="<?php echo $each['id'] ?>">
 												Chọn
 											</a>
 										</button>
@@ -89,7 +88,7 @@ mysqli_close($connect);
 										</span>
 									<?php } else {?>
 										<button style="display: none;" class="btn-rcv">
-											<a class="btn-receiver" data-id="<?php echo $each['id'] ?>" data-type="slc">
+											<a class="btn-receiver" data-id="<?php echo $each['id'] ?>">
 												Chọn
 											</a>
 										</button>
@@ -126,12 +125,11 @@ include 'receiver_form_change.php';
 			let parent_tr = btn.parents("tr");
 			let parent_tb = btn.parents("table");
 			let id = btn.data('id');
-			let type = btn.data('type');
 			$.ajax({
 				url: 'receiver_process.php',
 				type: 'GET',
 				dataType: 'json',
-				data: {id, type},
+				data: {id},
 			})
 			.done(function(response) {
 				$("#span-name").text(response["name"]);
@@ -148,14 +146,15 @@ include 'receiver_form_change.php';
 			<?php $_SESSION['modal'] = "rcv" ?>
 			let btn = $(this);
 			let id = btn.data('id');
+			let num = btn.data('num');
 			$.ajax({
 				url: 'receiver_data.php',
 				type: 'POST',
 				dataType: 'json',
-				data: {id},
+				data: {id, num},
 			})
 			.done(function(response) {
-				$("#span_rcv_id").text(response["id"]);
+				$("#span_rcv_id").text(response["num"]);
 				$("#rcv_id").attr('value', response["id"]);
 				$("#rcv_name").attr('value', response["name"]);
 				$("#rcv_phone").attr('value', response["phone"]);

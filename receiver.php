@@ -22,8 +22,9 @@ require 'check_account.php';
 <body>
 	<?php 
 	require 'connect.php';
+	require 'notify.php';
 	$customer_id = $_SESSION['customer_id'];
-	$sql = "select * from receivers where customer_id = '$customer_id'";
+	$sql = "select * from receivers where customer_id = '$customer_id' and status <> '2'";
 	$result = mysqli_query($connect,$sql);
 	$rows = mysqli_num_rows($result);
 	$num = 0;
@@ -99,7 +100,7 @@ require 'check_account.php';
 							?>
 							<tr>
 								<td>
-									<span id="span-<?php echo $num ?>"><?php echo $num ?></span>
+									<span><?php echo $num ?></span>
 								</td>
 								<td>
 									<span class="span-name"><?php echo $each['name'] ?></span>
@@ -111,19 +112,19 @@ require 'check_account.php';
 									<span class="span-address"><?php echo $each['address'] ?></span>
 								</td>
 								<td>
-									<a href="receiver_delete_process.php?id=<?php echo $num ?>">
+									<a href="receiver_delete_process.php?id=<?php echo $each['id'] ?>">
 										Xoá
 									</a>
 								</td>
 								<td>
-									<a data-toggle="modal" href="#modal-receiver-form-change" id="btn-receiver-form" data-id="<?php echo $each['id'] ?>">
+									<a data-toggle="modal" href="#modal-receiver-form-change" class="btn-receiver-form" data-id="<?php echo $each['id'] ?>" data-num="<?php echo $num ?>">
 										Sửa
 									</a>
 								</td>
 								<td class="center">
-									<?php if ($each['status'] == 2) { ?>
+									<?php if ($each['status'] == 1) { ?>
 										<button style="display: none;">
-											<a data-toggle="modal" href="#modal-receiver" class="btn-receiver" data-id="<?php echo $each['id'] ?>" data-type="dfl">
+											<a data-toggle="modal" href="#modal-receiver" class="btn-receiver" data-id="<?php echo $each['id'] ?>">
 												<span>
 													Chọn
 												</span>
@@ -134,7 +135,7 @@ require 'check_account.php';
 										</span>
 									<?php } else {?>
 										<button>
-											<a data-toggle="modal" href="#modal-receiver" class="btn-receiver" data-id="<?php echo $each['id'] ?>" data-type="dfl">
+											<a data-toggle="modal" href="#modal-receiver" class="btn-receiver" data-id="<?php echo $each['id'] ?>">
 												<span>
 													Chọn
 												</span>
@@ -152,13 +153,13 @@ require 'check_account.php';
 					?>
 				</table>
 			</div>
-			<br>
 		</div>
 		<div id="div_duoi">
+			<br>
 			<?php 
-			require 'footer.php';
 			include 'receiver_form.php';
 			include 'receiver_form_change.php';
+			require 'footer.php';
 			?>
 		</div>
 	</div>
@@ -172,11 +173,10 @@ require 'check_account.php';
 			let parent_tr = btn.parents("tr");
 			let parent_tb = btn.parents("table");
 			let id = btn.data('id');
-			let type = btn.data('type');
 			$.ajax({
 				url: 'receiver_process.php',
 				type: 'GET',
-				data: {id, type},
+				data: {id},
 			})
 			.done(function(response) {
 				parent_tb.find('button').show();
@@ -199,18 +199,19 @@ require 'check_account.php';
 				location.reload();
 			})
 		});
-		$("#btn-receiver-form").click(function() {
+		$(".btn-receiver-form").click(function() {
 			event.preventDefault();
 			let btn = $(this);
 			let id = btn.data('id');
+			let num = btn.data('num');
 			$.ajax({
 				url: 'receiver_data.php',
 				type: 'POST',
 				dataType: 'json',
-				data: {id},
+				data: {id, num},
 			})
 			.done(function(response) {
-				$("#span_rcv_id").text(response["id"]);
+				$("#span_rcv_id").text(response["num"]);
 				$("#rcv_id").attr('value', response["id"]);
 				$("#rcv_name").attr('value', response["name"]);
 				$("#rcv_phone").attr('value', response["phone"]);
@@ -218,10 +219,4 @@ require 'check_account.php';
 			})
 		});
 	});
-</script>
-<script type="text/javascript">
-	if ("<?php echo $_SESSION['notify'] ?>" != "") {
-		$.notify("<?php echo $_SESSION['notify'] ?>", "success");
-		<?php unset($_SESSION['notify']) ?>
-	}
 </script>

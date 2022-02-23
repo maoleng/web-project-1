@@ -1,4 +1,5 @@
 <?php 
+require '../connect_database.php';
 $sql_select_last_id_activity = "
 	SELECT id from activities 
 	ORDER BY id DESC

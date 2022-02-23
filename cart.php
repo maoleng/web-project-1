@@ -25,6 +25,7 @@ require 'check_account.php';
 		<?php
 		$total = 0;
 		require 'connect.php';
+		require 'notify.php';
 		require 'menu.php';
 		$status = '1';
 		$sql = "select
@@ -181,8 +182,8 @@ require 'check_account.php';
 			?>
 		</div>
 		<div id="div_duoi">
+			<br>
 			<?php
-			mysqli_close($connect);
 			require 'footer.php';
 			?>
 		</div>
