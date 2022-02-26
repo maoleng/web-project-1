@@ -1,3 +1,4 @@
+<?php require '../check_admin_login.php' ?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,12 +6,15 @@
 	<link rel="stylesheet" href="../index3.css">
 	<link rel="stylesheet" type="text/css" href="style_chart.css">
 	<link rel="stylesheet" type="text/css" href="../style_table.css">
+	<link rel="stylesheet" href="../style_validate1.css">
+
 </head>
 
 <body> 
 <?php require '../menu.php'; ?>
+<?php require '../validate.php' ?>
 <div class="top">
-	<div class = "search">
+	<!-- <div class = "search">
 		<form class = "form_search">
 			Tìm kiếm
 			<input type="search" name="search" value = "<?php echo $content_search ?>">
@@ -18,11 +22,11 @@
 				<img src="../style/style_image/icon_search.png" width="50px">
 			</button>
 		</form>
-	</div>
+	</div> -->
 
 	<div class = "login">
-		<a class = "login" href="https://google.com">Đăng nhập</a>
-	</div> 
+		<span>Xin chào <?php echo $_SESSION['name'] ?></span>
+	</div>
 </div>
 
 <div class = "bot">

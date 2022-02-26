@@ -9,6 +9,12 @@
 </head>
 
 <?php 
+if ( empty($_GET['id']) ){
+	$_SESSION['error'] = 'Chưa nhập id hóa đơn';
+	header('location:index.php');
+	exit;
+}
+
 $id = $_GET['id'];
 
 require '../connect_database.php';
@@ -19,7 +25,7 @@ $query_sql_command_select = mysqli_query($connect_database, $sql_command_select)
 $check = mysqli_num_rows($query_sql_command_select);
 if ( $check !== 1 ) {
 	$_SESSION['error'] = 'Không tồn tại hóa đơn này';
-	header('location:index_receipts.php');
+	header('location:index.php');
 	exit();
 }
 
@@ -34,7 +40,7 @@ $money_of_all = 0;
 <body> 
 <?php require '../menu.php'; ?>
 <div class="top">
-	<div class = "search">
+	<!-- <div class = "search">
 		<form class = "form_search">
 			Tìm kiếm
 			<input type="search" name="search" value = "<?php echo $content_search ?>">
@@ -42,11 +48,11 @@ $money_of_all = 0;
 				<img src="../style/style_image/icon_search.png" width="50px">
 			</button>
 		</form>
-	</div>
+	</div> -->
 
 	<div class = "login">
-		<a class = "login" href="https://google.com">Đăng nhập</a>
-	</div> 
+		<span>Xin chào <?php echo $_SESSION['name'] ?></span>
+	</div>
 </div>
 
 <div class = "bot">

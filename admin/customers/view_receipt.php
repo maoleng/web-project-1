@@ -9,9 +9,21 @@
 </head>
 
 <?php 
+require '../connect_database.php';
+
+if (empty($_GET['id'])){
+	$_SESSION['error'] = 'Chưa nhập id khách hàng';
+	header('location:index.php');
+	exit;
+}
 $id = $_GET['id'];
 
-require '../connect_database.php';
+$check = mysqli_num_rows(mysqli_query($connect_database, "SELECT id FROM customers WHERE id = '$id' "));
+if ( empty($check) ) {
+	$_SESSION['error'] = 'Sai id khách hàng';
+	header('location:index.php');
+	exit;
+}
 
 $sql_select_name = "SELECT name FROM customers WHERE id = '$id'";
 $name = mysqli_fetch_array(mysqli_query($connect_database, $sql_select_name))['name'] ;
@@ -55,7 +67,7 @@ $query_sql_command_select = mysqli_query($connect_database, $sql_command_select)
 <body> 
 <?php require '../menu.php'; ?>
 <div class="top">
-	<div class = "search">
+	<!-- <div class = "search">
 		<form class = "form_search">
 			Tìm kiếm
 			<input type="search" name="search" value = "<?php echo $content_search ?>">
@@ -63,11 +75,11 @@ $query_sql_command_select = mysqli_query($connect_database, $sql_command_select)
 				<img src="../style/style_image/icon_search.png" width="50px">
 			</button>
 		</form>
-	</div>
+	</div> -->
 
 	<div class = "login">
-		<a class = "login" href="https://google.com">Đăng nhập</a>
-	</div> 
+		<span>Xin chào <?php echo $_SESSION['name'] ?></span>
+	</div>
 </div>
 
 <div class = "bot">

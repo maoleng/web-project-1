@@ -1,4 +1,5 @@
-<?php require '../check_super_admin_login.php'; 
+<?php 
+require '../check_admin_login.php';
 
 ?>
 <!DOCTYPE html>
@@ -16,16 +17,30 @@
 
 
 <?php 
-require '../connect_database.php';
+if (empty($_GET['id'])){
+	$_SESSION['error'] = 'Chưa nhập id sản phẩm để thêm thẻ vào sản phẩm';
+	header('location:index_insert_hashtags_to_product.php');
+	exit;
+}
+
 $id = $_GET['id'];
+
+require '../connect_database.php';
 $sql_select_products = "SELECT * FROM products WHERE id = '$id'";
+$query_select_products = mysqli_query($connect_database, $sql_select_products);
+$check_num_rows = mysqli_num_rows($query_select_products);
+if ( $check_num_rows != 1 ) {
+	$_SESSION['error'] = 'Sai id thẻ để thêm thẻ vào sản phẩm';
+	header('location:index_insert_hashtags_to_product.php');
+	exit;
+}
 $product_name = mysqli_fetch_array(mysqli_query($connect_database, $sql_select_products))['name'];
 ?>
 
 <body> 
 <?php require '../menu.php'; ?>
 <div class="top">
-	<div class = "search">
+	<!-- <div class = "search">
 		<form class = "form_search">
 			Tìm kiếm
 			<input type="search" name="search" value = "<?php echo $content_search ?>">
@@ -33,11 +48,11 @@ $product_name = mysqli_fetch_array(mysqli_query($connect_database, $sql_select_p
 				<img src="../style/style_image/icon_search.png" width="50px">
 			</button>
 		</form>
-	</div>
+	</div> -->
 
 	<div class = "login">
-		<a class = "login" href="https://google.com">Đăng nhập</a>
-	</div> 
+		<span>Xin chào <?php echo $_SESSION['name'] ?></span>
+	</div>
 </div>
 
 <div class = "bot">
