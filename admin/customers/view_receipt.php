@@ -49,12 +49,13 @@ $count_pages = ceil ($count_receipts / $receipts_on_page);
 $skip_receipts_page = ( $i - 1 ) * $receipts_on_page;
 
 $sql_command_select = "
-	SELECT receipts.*, customers.name as 'customer_name', receivers.name as 'receiver_name', receivers.phone as 'receiver_phone', receivers.address as 'receiver_address'
-	from receipts
-	left JOIN receivers on receivers.id = receipts.receiver_id
-	join customers on customers.id = receipts.customer_id
-	WHERE receipts.customer_id = '$id' and receipts.status in (2, 4)
+	SELECT receipts.id as 'id', receipts.order_time as 'order_time', receivers.name as 'receiver_name', receivers.phone as 'receiver_phone', receivers.address as 'receiver_address', customers.name as 'customer_name', receipts.status, receipts.total
+	FROM receipts
+	LEFT JOIN receivers ON receivers.customer_id = receipts.customer_id
+	LEFT JOIN customers ON customers.id = receivers.customer_id
+	WHERE receipts.status in (2, 4) AND receipts.customer_id = '$id'
 	GROUP BY receipts.id
+	ORDER BY receipts.order_time desc
 	limit $receipts_on_page offset $skip_receipts_page
 ";
 
@@ -130,7 +131,7 @@ $query_sql_command_select = mysqli_query($connect_database, $sql_command_select)
 				</td>
 				<td><?php echo $each_receipt['total'] ?></td>
 				<td>
-					<a href="detail_receipt.php?id=<?php echo $each_receipt['id'] ?>">Xem</a>
+					<a href="../receipts/detail_receipt.php?id=<?php echo $each_receipt['id'] ?>">Xem</a>
 				</td>
 				<td>
 					<?php if ( $each_receipt['status'] == 2 ) { ?>

@@ -22,7 +22,6 @@ require 'check_account.php';
 </head>
 <body>
 	<div id="div_tong" class="container">
-		
 		<div id="div_tren">
 			<div style="background: sandybrown; padding: 10px 20px 10px 10px;">
 				<?php require 'menu.php'; ?>
@@ -55,65 +54,64 @@ require 'check_account.php';
 		<div id="div_giua" >
 			<div style="text-align: center; margin: 0px;">
 				<?php 
-			if (empty($_GET['status'])) {
-				$status = 2;
-			} else {
-				$status = $_GET['status'];
-			}
-			switch ($status) {
-				case '2': 
+				if (empty($_GET['status'])) {
+					$status = 2;
+				} else {
+					$status = $_GET['status'];
+				}
+				switch ($status) {
+					case '2': 
+					?>
+					<h3>
+						Đơn hàng đang chờ xét duyệt !
+					</h3>
+					<?php 
+					break;
+					case '3': 
+					?>
+					<h3>
+						Đơn hàng không qua xét duyệt !
+					</h3>
+					<?php 
+					break;
+					case '4': 
+					?>
+					<h3>
+						Đơn hàng đang giao hàng !
+					</h3>
+					<?php 
+					break;
+					case '5': 
+					?>
+					<h3>					
+						Đơn hàng đã giao hàng!
+					</h3>				
+					<?php 
+					break;
+					case '6': 
+					?>
+					<h3>
+						Đơn hàng thành công!
+					</h3>
+					<?php 
+					break;
+					case '7': 
+					?>
+					<h3>
+						Đơn hàng đã huỷ !
+					</h3>
+					<?php 
+					break;
+					default:
+					?>
+					<h3>
+						Đơn hàng đang chờ xét duyệt !
+					</h3>
+					<?php
+					break;
+				}
 				?>
-				<h3>
-					Đơn hàng đang chờ xét duyệt !
-				</h3>
-				<?php 
-				break;
-				case '3': 
-				?>
-				<h3>
-					Đơn hàng không qua xét duyệt !
-				</h3>
-				<?php 
-				break;
-				case '4': 
-				?>
-				<h3>
-					Đơn hàng đang giao hàng !
-				</h3>
-				<?php 
-				break;
-				case '5': 
-				?>
-				<h3>					
-					Đơn hàng đã giao hàng!
-				</h3>				
-				<?php 
-				break;
-				case '6': 
-				?>
-				<h3>
-					Đơn hàng thành công!
-				</h3>
-				<?php 
-				break;
-				case '7': 
-				?>
-				<h3>
-					Đơn hàng đã huỷ !
-				</h3>
-				<?php 
-				break;
-				default:
-				?>
-				<h3>
-					Đơn hàng đang chờ xét duyệt !
-				</h3>
-				<?php
-				break;
-			}
-			?>
 			</div>
-
 			<br>
 			<?php 
 			require 'connect.php';
@@ -187,7 +185,7 @@ require 'check_account.php';
 										<?php echo $each['name'] ?>
 									</a>
 								</td>
-								<td>
+								<td height="155px">
 									<img width="200px" height="150px" src="admin/products/<?php echo $each['image']; ?>">
 								</td>
 								<td>
@@ -245,7 +243,7 @@ require 'check_account.php';
 								?>
 							</td>
 							<td>
-								<a data-toggle="modal" href="#modal-order-detail" id="btn-order-detail" data-id="<?php echo $each['receipt_id'] ?>">
+								<a data-toggle="modal" href="#modal-order-detail" id="btn-order-detail">
 									Xem chi tiết >>>
 								</a>
 							</td>
@@ -267,18 +265,12 @@ require 'check_account.php';
 	</div>
 </body>
 </html>
+<script src="https://cdn.jsdelivr.net/npm/uuid@latest/dist/umd/uuidv4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://unpkg.com/html2canvas@1.3.2/dist/html2canvas.min.js"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
-		$("#btn-order-detail").click(function() {
-			let btn = $(this);
-			let id = btn.data('id');
-			$.ajax({
-				url: 'order_detail.php',
-				type: 'default GET (Other values: POST)',
-				dataType: 'default: Intelligent Guess (Other values: xml, json, script, or html)',
-				data: {id},
-			})
-		});
 		$("#btn-order-delete").click(function() {
 			let btn = $(this);
 			let id = btn.data('id');
@@ -293,4 +285,5 @@ require 'check_account.php';
 			})
 		});
 	});
+
 </script>

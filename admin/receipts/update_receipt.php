@@ -7,21 +7,26 @@ if (empty($_GET['id'])){
 	header('location:index.php');
 	exit;
 }
+$id = $_GET['id'];
+
+//kiểm tra xem có id hóa đơn đó không
+require '../connect_database.php';
+$sql_command_select = "select * from receipts where id = '$id' ";
+$query_sql_command_select = mysqli_query($connect_database, $sql_command_select);
+$check = mysqli_num_rows($query_sql_command_select);
+if ( $check != 1 ) {
+	$_SESSION['error'] = 'Không tồn tại hóa đơn này';
+	header('location:index.php');
+	exit();
+}
+
 if (empty($_GET['status'])){
 	$_SESSION['error'] = 'Chưa nhập trạng thái sản phẩm muốn cập nhật';
 	header('location:index.php');
 	exit;
 }
+$status = $_GET['status'];
 
-//kiểm tra xem có id hóa đơn đó không
-$sql_command_select = "select * from receipts where id = '$id' ";
-$query_sql_command_select = mysqli_query($connect_database, $sql_command_select);
-$check = mysqli_num_rows($query_sql_command_select);
-if ( $check !== 1 ) {
-	$_SESSION['error'] = 'Không tồn tại hóa đơn này';
-	header('location:index.php');
-	exit();
-}
 
 //kiểm tra trạng thái của hóa đơn có hợp lệ
 if ( $status != '4a' && $status != '0' && $status != 1 && $status != 2 && $status != 3 && $status != 4 && $status != 5 && $status != 6 && $status != 7 && $status != 8 && $status != '0' ) {
@@ -94,17 +99,20 @@ if (empty($error)) {
 	if ( isset($_GET['from']) ) {
 		$from = $_GET['from'];
 		$customer_id = $_GET['customer_id'];
+		$_SESSION['success'] = 'Cập nhật hóa đơn thành công';
 		$header = "location:../customers/view_receipts_finished.php?id=$customer_id";
 		header($header);
 		exit();
 	}
 	if ( isset($_GET['customer_id']) ) {
 		$customer_id = $_GET['customer_id'];
+		$_SESSION['success'] = 'Cập nhật hóa đơn thành công';
 		$header = "location:../customers/view_receipt.php?id=$customer_id";
 		header($header);
 		exit();
 	}
 	if ( $_GET['status'] == 2 || $_GET['status'] == '4a' ) {
+		$_SESSION['success'] = 'Cập nhật hóa đơn thành công';
 		header('location:view_receipts_finished.php');
 		exit();
 	}
